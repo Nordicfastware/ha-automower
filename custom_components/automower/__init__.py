@@ -11,10 +11,16 @@ import voluptuous as vol
 
 from datetime import datetime
 from homeassistant.const import CONF_ICON, CONF_PASSWORD, CONF_SCAN_INTERVAL, CONF_USERNAME
-from homeassistant.components.vacuum import (
+try:
+    from homeassistant.components.vacuum import (
     SUPPORT_BATTERY, SUPPORT_PAUSE, SUPPORT_RETURN_HOME,
     SUPPORT_STATUS, SUPPORT_STOP, SUPPORT_TURN_OFF,
-    SUPPORT_TURN_ON, VacuumDevice)
+    SUPPORT_TURN_ON, VacuumEntity)
+except ImportError:
+    from homeassistant.components.vacuum import (
+    SUPPORT_BATTERY, SUPPORT_PAUSE, SUPPORT_RETURN_HOME,
+    SUPPORT_STATUS, SUPPORT_STOP, SUPPORT_TURN_OFF,
+    SUPPORT_TURN_ON, VacuumDevice as VacuumEntity)
 
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import discovery
@@ -56,7 +62,7 @@ STATUSES = {
     STATUS_PARKED_TIMER:            { 'icon': 'mdi:timetable',      'message': 'Parked (week timer)' },
     STATUS_PARKED_AUTOTIMER:        { 'icon': 'mdi:weather-partly-cloudy',      'message': 'Parked (weather timer)' },
     STATUS_PARKED_PARKED_SELECTED:  { 'icon': 'mdi:garage',          'message': 'Parked (manual)' },
-    STATUS_OK_SEARCHING:            { 'icon': 'mdi:magnify',        'message': 'Searching charging station' },
+    STATUS_OK_SEARCHING:            { 'icon': 'mdi:magnify',        'message': 'Going to charging station' },
     STATUS_EXECUTING_START:         { 'icon': 'mdi:dots-horizontal','message': 'Starting...' },
     STATUS_EXECUTING_STOP:          { 'icon': 'mdi:dots-horizontal','message': 'Stopping...' },
     STATUS_WAIT_POWER_UP:           { 'icon': 'mdi:dots-horizontal','message': 'Powering up...' },
@@ -167,6 +173,7 @@ MODELS = {
     'E': 'Automower 420',
     'G': 'Automower 430X',
     'H': 'Automower 450X',
+    'K': 'Automower 310',
     'L': 'Automower 315/X'
 }
 
@@ -220,7 +227,7 @@ def setup(hass, base_config):
     return True
 
 
-class AutomowerDevice(VacuumDevice):
+class AutomowerDevice(VacuumEntity):
     """Representation of an Automower device."""
 
     def __init__(self, meta, api):
